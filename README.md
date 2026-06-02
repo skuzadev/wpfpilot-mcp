@@ -1,54 +1,79 @@
 # WpfPilot MCP
 
-WpfPilot MCP is a local Model Context Protocol server for inspecting, automating, diagnosing, and test-generating against Windows WPF applications.
-
-It connects coding agents to WPF through UI Automation and an optional in-process probe, so an agent can work with semantic controls, selectors, ViewModels, commands, bindings, validation state, screenshots, recordings, and generated tests.
+WpfPilot MCP is a local Model Context Protocol server for Windows WPF applications. It lets AI coding agents inspect UI Automation trees, click and type through semantic selectors, diagnose WPF-specific issues, record workflows, and generate xUnit + FlaUI tests.
 
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![MCP](https://img.shields.io/badge/MCP-stdio-blue)](https://modelcontextprotocol.io/)
 [![Windows](https://img.shields.io/badge/platform-Windows-0078D4?logo=windows)](#requirements)
 [![License](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
 
-## Features
+## Install
 
-- Attach to a running WPF process or launch one from the MCP client.
-- Query semantic UI state: names, AutomationIds, control types, bounds, patterns, children, ancestors, and selection.
-- Act without screen coordinates through selectors and element paths.
-- Wait and assert on UI state with structured success/error responses.
-- Capture screenshots and UI snapshots.
-- Record workflows and generate xUnit + FlaUI tests.
-- Use the optional probe for WPF-specific diagnostics: DataContext, ViewModel properties, ICommand state, binding errors, validation state, and dispatcher status.
+Recommended install, no source checkout or build required:
+
+```powershell
+irm https://raw.githubusercontent.com/styleben/wpfpilot-mcp/main/scripts/install.ps1 | iex
+```
+
+Verify the command is available:
+
+```powershell
+wpfpilot-mcp
+```
+
+The server uses MCP over stdio, so it will wait for a client when run directly.
+
+Upgrade later:
+
+```powershell
+irm https://raw.githubusercontent.com/styleben/wpfpilot-mcp/main/scripts/install.ps1 | iex
+```
+
+Uninstall:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\WpfPilot\bin\uninstall.ps1"
+```
+
+Manual install: download `wpfpilot-mcp-win-x64.zip` from the GitHub Releases page, extract it, and point your MCP client at `wpfpilot-mcp.exe`.
 
 ## Requirements
 
 - Windows 10/11.
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
 - A WPF application to automate.
-- An MCP client that supports local stdio servers.
+- No .NET SDK is required when using the installer or release zip.
 
-Build once before connecting an agent:
+## Configure Your MCP Client
 
-```powershell
-git clone https://github.com/your-github-user/wpfpilot-mcp.git
-cd wpfpilot-mcp
-dotnet build WpfPilotMcp.sln
+Most clients need the same stdio server definition:
+
+```json
+{
+  "mcpServers": {
+    "wpfpilot-mcp": {
+      "command": "wpfpilot-mcp",
+      "args": []
+    }
+  }
+}
 ```
 
-Run the server manually to verify it starts:
-
-```powershell
-dotnet run --project src/WpfPilot.Mcp.Server/WpfPilot.Mcp.Server.csproj
-```
-
-The process speaks MCP over stdio, so it will wait for a client after startup.
-
-## Install In MCP Clients
-
-Use an absolute project path in client configs. Replace `C:\src\wpfpilot-mcp` with your local clone path.
+For a full client matrix, see [docs/all-clients.md](docs/all-clients.md).
 
 ### Claude Desktop
 
-Open Claude Desktop, go to Settings -> Developer -> Edit Config, then add WpfPilot under `mcpServers` in `claude_desktop_config.json`.
+Open Claude Desktop -> Settings -> Developer -> Edit Config, then add:
+
+```json
+{
+  "mcpServers": {
+    "wpfpilot-mcp": {
+      "command": "wpfpilot-mcp",
+      "args": []
+    }
+  }
+}
+```
 
 Windows config path:
 
@@ -56,74 +81,28 @@ Windows config path:
 %APPDATA%\Claude\claude_desktop_config.json
 ```
 
-macOS config path, for reference:
-
-```text
-~/Library/Application Support/Claude/claude_desktop_config.json
-```
-
-Configuration:
-
-```json
-{
-  "mcpServers": {
-    "wpfpilot-mcp": {
-      "type": "stdio",
-      "command": "dotnet",
-      "args": [
-        "run",
-        "--project",
-        "C:\\src\\wpfpilot-mcp\\src\\WpfPilot.Mcp.Server\\WpfPilot.Mcp.Server.csproj"
-      ]
-    }
-  }
-}
-```
-
-Restart Claude Desktop after saving the file.
+Restart Claude Desktop after saving.
 
 ### Claude Code
 
-Add WpfPilot with the Claude Code CLI:
-
 ```powershell
-claude mcp add --transport stdio wpfpilot-mcp -- dotnet run --project C:\src\wpfpilot-mcp\src\WpfPilot.Mcp.Server\WpfPilot.Mcp.Server.csproj
+claude mcp add --transport stdio wpfpilot-mcp -- wpfpilot-mcp
 claude mcp list
-```
-
-For a project-scoped config, create `.mcp.json` in your project:
-
-```json
-{
-  "mcpServers": {
-    "wpfpilot-mcp": {
-      "type": "stdio",
-      "command": "dotnet",
-      "args": [
-        "run",
-        "--project",
-        "C:\\src\\wpfpilot-mcp\\src\\WpfPilot.Mcp.Server\\WpfPilot.Mcp.Server.csproj"
-      ]
-    }
-  }
-}
 ```
 
 ### Codex CLI
 
-Add WpfPilot with the Codex CLI:
-
 ```powershell
-codex mcp add wpfpilot-mcp -- dotnet run --project C:\src\wpfpilot-mcp\src\WpfPilot.Mcp.Server\WpfPilot.Mcp.Server.csproj
+codex mcp add wpfpilot-mcp -- wpfpilot-mcp
 codex mcp list
 ```
 
-Or edit `~/.codex/config.toml`:
+Equivalent `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.wpfpilot-mcp]
-command = "dotnet"
-args = ["run", "--project", "C:\\src\\wpfpilot-mcp\\src\\WpfPilot.Mcp.Server\\WpfPilot.Mcp.Server.csproj"]
+command = "wpfpilot-mcp"
+args = []
 enabled = true
 startup_timeout_sec = 30
 tool_timeout_sec = 60
@@ -131,101 +110,88 @@ tool_timeout_sec = 60
 
 ### Cursor
 
-For a repository-specific setup, create `.cursor/mcp.json` in the repository where you want Cursor to use WpfPilot:
+Create or edit `.cursor/mcp.json` in your project, or `~/.cursor/mcp.json` globally:
 
 ```json
 {
   "mcpServers": {
     "wpfpilot-mcp": {
-      "command": "dotnet",
-      "args": [
-        "run",
-        "--project",
-        "C:\\src\\wpfpilot-mcp\\src\\WpfPilot.Mcp.Server\\WpfPilot.Mcp.Server.csproj"
-      ]
+      "command": "wpfpilot-mcp",
+      "args": []
     }
   }
 }
 ```
 
-For global Cursor use, place the same JSON in:
-
-```text
-~/.cursor/mcp.json
-```
-
-Cursor Agent can then inspect the server:
-
-```powershell
-cursor-agent mcp list
-cursor-agent mcp list-tools wpfpilot-mcp
-```
-
 ### VS Code
 
-If your VS Code build supports MCP through `.vscode/mcp.json`, add:
+Create `.vscode/mcp.json`:
 
 ```json
 {
   "servers": {
     "wpfpilot-mcp": {
       "type": "stdio",
-      "command": "dotnet",
-      "args": [
-        "run",
-        "--project",
-        "${workspaceFolder}/src/WpfPilot.Mcp.Server/WpfPilot.Mcp.Server.csproj"
-      ]
+      "command": "wpfpilot-mcp",
+      "args": []
     }
   }
 }
 ```
 
-## First Use
+## First Prompt
 
-After the client connects, ask it to:
+After connecting the MCP client, ask:
 
 ```text
-List the WpfPilot tools and attach to my running WPF process.
+List the WpfPilot tools and attach to my running WPF application.
 ```
 
-Useful starting tools:
+Useful follow-up prompts:
+
+```text
+Show the main window UI tree.
+Click the Save button using a selector, not coordinates.
+Wait until the status text says Saved.
+Why is the Submit button disabled?
+Record this workflow and generate an xUnit test.
+```
+
+## What It Can Do
+
+- Attach to or launch WPF processes.
+- Capture semantic UI snapshots.
+- Query text, value, state, bounds, patterns, children, ancestors, siblings, and selection.
+- Act with verbs such as click, set value, select, toggle, expand, collapse, scroll, and drag/drop.
+- Wait and assert on UI state with structured errors.
+- Capture screenshots.
+- Record workflows and generate test code.
+- Use an optional in-process probe for ViewModel, binding, command, validation, and dispatcher diagnostics.
+
+Core verb tools:
 
 | Tool | Purpose |
 | --- | --- |
-| `wpf_session_status` | Show current attachment status. |
-| `wpf_list_processes` | Find candidate Windows processes. |
-| `wpf_attach` | Attach by process ID or process name. |
-| `wpf_snapshot` | Capture the current UI Automation tree. |
 | `wpf_capabilities` | List supported verbs, query kinds, and wait conditions. |
 | `wpf_query` | Read UI state. |
-| `wpf_act` | Perform an action. |
-| `wpf_wait` | Wait for a UI condition. |
-| `wpf_assert` | Verify a UI condition. |
-
-Example prompts:
-
-```text
-Attach to the running ContosoApp process and show the main window tree.
-Click the Save button using a selector, not coordinates.
-Wait until the status text says Saved, then generate an xUnit test for the workflow.
-Why is the Submit button disabled?
-```
+| `wpf_act` | Perform UI actions. |
+| `wpf_wait` | Wait for UI state. |
+| `wpf_assert` | Verify UI state. |
 
 ## Optional WPF Probe
 
 The probe runs inside your WPF process and exposes diagnostics that UI Automation cannot see directly.
 
-Reference the probe project or package from your WPF app:
-
-```xml
-<ProjectReference Include="..\wpfpilot-mcp\src\WpfPilot.Mcp.Probe\WpfPilot.Mcp.Probe.csproj" />
-```
-
-If you publish the package internally or to NuGet later:
+Install after the probe package is published:
 
 ```powershell
 dotnet add package WpfPilot.Mcp.Probe
+```
+
+Or reference the project while developing locally:
+
+```xml
+<ProjectReference Include="..\wpfpilot-mcp\src\WpfPilot.Mcp.Probe\WpfPilot.Mcp.Probe.csproj" />
 ```
 
 Start the probe from `App.xaml.cs`:
@@ -241,39 +207,46 @@ protected override void OnStartup(StartupEventArgs e)
 }
 ```
 
-Then connect from the MCP client:
+Then ask your MCP client:
 
 ```text
 Use wpf_probe_connect, then inspect my ViewModel and binding errors.
 ```
 
-The default pipe name is:
+Default pipe name:
 
 ```text
 wpfpilot-mcp-probe-{ProcessId}
 ```
 
-## Safety
+## Release Maintainers
 
-WpfPilot is intended for local development and test automation.
-
-- It runs as your user account and can interact with UI visible to that account.
-- It does not expose general shell, registry, or arbitrary filesystem tools through MCP.
-- Mutating UI actions are audited under the user's local app data folder.
-- The probe requires explicit installation in the target WPF app.
-- Treat every MCP server as trusted local code before enabling it in an agent.
-
-## Development
-
-Build:
+Build and test:
 
 ```powershell
-dotnet build WpfPilotMcp.sln
+dotnet build WpfPilotMcp.sln --configuration Release
+dotnet test WpfPilotMcp.sln --configuration Release --no-build
 ```
 
-Test:
+Publish a self-contained Windows zip:
 
 ```powershell
+dotnet publish src/WpfPilot.Mcp.Server/WpfPilot.Mcp.Server.csproj --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=false --output artifacts/wpfpilot-mcp-win-x64
+Rename-Item artifacts/wpfpilot-mcp-win-x64/WpfPilot.Mcp.Server.exe wpfpilot-mcp.exe
+Remove-Item artifacts/wpfpilot-mcp-win-x64/*.pdb -Force
+Compress-Archive -Path artifacts/wpfpilot-mcp-win-x64/* -DestinationPath artifacts/wpfpilot-mcp-win-x64.zip -Force
+```
+
+Tagging `vX.Y.Z` runs the release workflow and uploads the Windows zip.
+
+## Development From Source
+
+Source builds are only needed for contributors:
+
+```powershell
+git clone https://github.com/<owner>/wpfpilot-mcp.git
+cd wpfpilot-mcp
+dotnet build WpfPilotMcp.sln
 dotnet test WpfPilotMcp.sln
 ```
 
@@ -290,22 +263,29 @@ wpfpilot-mcp/
     WpfPilot.Mcp.Core.Tests/
     WpfPilot.Mcp.Probe.Tests/
     WpfPilot.Mcp.Codegen.Tests/
+    WpfPilot.Mcp.IntegrationTests/
   docs/
 ```
 
+## Safety
+
+WpfPilot is intended for local development and test automation.
+
+- It runs as your user account and can interact with UI visible to that account.
+- It does not expose general shell, registry, or arbitrary filesystem tools through MCP.
+- Mutating UI actions are audited under the user's local app data folder.
+- The probe requires explicit installation in the target WPF app.
+- Treat every MCP server as trusted local code before enabling it in an agent.
+
 ## Troubleshooting
 
-`spawn dotnet ENOENT`
+`wpfpilot-mcp` is not recognized
 
-Install the .NET 8 SDK and make sure `dotnet` is on PATH. If your client cannot find it, use the full path to `dotnet.exe`.
+Restart your terminal after running the installer, or use the full path to `wpfpilot-mcp.exe` in your MCP client configuration.
 
 Server starts but no tools appear
 
-Run `dotnet build WpfPilotMcp.sln`, restart the MCP client, and check the client's MCP logs. For Claude Desktop, the official MCP guide documents logs under `%APPDATA%\Claude\logs` on Windows and `~/Library/Logs/Claude` on macOS.
-
-Client cannot find the project
-
-Use an absolute path in `args`. Desktop clients often start MCP servers from a different working directory than your repository.
+Restart the MCP client and check its MCP logs. Also verify `wpfpilot-mcp` runs from a normal terminal.
 
 Cannot attach to an app
 
@@ -313,10 +293,11 @@ Make sure the WPF app is running in the same user session and at a compatible pr
 
 Probe cannot connect
 
-Confirm the target app called `ProbeHost.Start()`, then use `wpf_probe_status` and `wpf_probe_connect`. If needed, pass the explicit pipe name `wpfpilot-mcp-probe-{ProcessId}`.
+Confirm the target app called `ProbeHost.Start()`, then use `wpf_probe_status` and `wpf_probe_connect`. If needed, pass `wpfpilot-mcp-probe-{ProcessId}` explicitly.
 
 ## Documentation
 
+- [All MCP clients](docs/all-clients.md)
 - [Tool reference](docs/tools-reference.md)
 - [Probe setup](docs/probe-setup.md)
 - [Architecture](docs/architecture.md)

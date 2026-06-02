@@ -2,12 +2,8 @@
   "servers": {
     "wpfpilot-mcp": {
       "type": "stdio",
-      "command": "dotnet",
-      "args": [
-        "run",
-        "--project",
-        "${workspaceFolder}/src/WpfPilot.Mcp.Server/WpfPilot.Mcp.Server.csproj"
-      ]
+      "command": "wpfpilot-mcp",
+      "args": []
     }
   }
 }
