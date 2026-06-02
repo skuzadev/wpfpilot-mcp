@@ -4,13 +4,21 @@ Installation examples for MCP clients.
 
 ## Install WpfPilot
 
-Install the MCP server once, no source checkout or build required:
+Run through npm, no source checkout or build required:
+
+```powershell
+npx -y @skuzadev/wpfpilot-mcp
+```
+
+The npm launcher downloads the latest Windows release binary on first run and caches it under `%LOCALAPPDATA%\WpfPilot\npm`.
+
+Optional persistent command install:
 
 ```powershell
 irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
 ```
 
-Upgrade:
+Upgrade the persistent command:
 
 ```powershell
 irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
@@ -22,7 +30,7 @@ Verify:
 wpfpilot-mcp
 ```
 
-If you install from a GitHub Release zip manually, replace `wpfpilot-mcp` in the examples below with the full path to `wpfpilot-mcp.exe`.
+If you install from a GitHub Release zip manually, replace the npm command in the examples below with the full path to `wpfpilot-mcp.exe`.
 
 ## Generic STDIO Configuration
 
@@ -32,8 +40,8 @@ Use this shape for clients that accept JSON MCP server configuration:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -61,8 +69,8 @@ Config:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -73,7 +81,7 @@ Restart Claude Desktop after saving.
 ## Claude Code
 
 ```powershell
-claude mcp add --transport stdio wpfpilot-mcp -- wpfpilot-mcp
+claude mcp add --transport stdio wpfpilot-mcp -- npx -y @skuzadev/wpfpilot-mcp
 claude mcp list
 ```
 
@@ -84,8 +92,8 @@ Project-scoped `.mcp.json`:
   "mcpServers": {
     "wpfpilot-mcp": {
       "type": "stdio",
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -94,7 +102,7 @@ Project-scoped `.mcp.json`:
 ## Codex CLI
 
 ```powershell
-codex mcp add wpfpilot-mcp -- wpfpilot-mcp
+codex mcp add wpfpilot-mcp -- npx -y @skuzadev/wpfpilot-mcp
 codex mcp list
 ```
 
@@ -102,8 +110,8 @@ Manual `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.wpfpilot-mcp]
-command = "wpfpilot-mcp"
-args = []
+command = "npx"
+args = ["-y", "@skuzadev/wpfpilot-mcp"]
 enabled = true
 startup_timeout_sec = 30
 tool_timeout_sec = 60
@@ -129,8 +137,8 @@ Config:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -152,8 +160,8 @@ Create `.vscode/mcp.json`:
   "servers": {
     "wpfpilot-mcp": {
       "type": "stdio",
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -167,8 +175,8 @@ Use the Cline MCP server configuration UI and add:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -183,8 +191,8 @@ Add to your Continue MCP configuration:
   "mcpServers": [
     {
       "name": "wpfpilot-mcp",
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   ]
 }
@@ -198,8 +206,8 @@ Add a local stdio MCP server:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -214,8 +222,8 @@ Add to `settings.json`:
   "context_servers": {
     "wpfpilot-mcp": {
       "source": "custom",
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -229,7 +237,7 @@ In JetBrains IDEs:
 2. Go to Tools -> AI Assistant -> Model Context Protocol (MCP).
 3. Click Add.
 4. Select STDIO.
-5. Use command `wpfpilot-mcp` with no arguments.
+5. Use command `npx` with arguments `-y @skuzadev/wpfpilot-mcp`.
 
 JSON form:
 
@@ -237,8 +245,8 @@ JSON form:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -253,8 +261,8 @@ For Visual Studio MCP configuration that uses the `servers` shape:
   "servers": {
     "wpfpilot-mcp": {
       "type": "stdio",
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -277,13 +285,13 @@ If a client cannot find global .NET tools on PATH, use the full executable path 
 
 ## Troubleshooting
 
-`wpfpilot-mcp` is not recognized
+`npx` is not recognized
 
-Restart the terminal or MCP client after installing the global tool. If needed, use the full path to the release executable.
+Install Node.js, restart the terminal or MCP client, or use the persistent installer and set command to `wpfpilot-mcp`.
 
 The server starts but the client shows no tools
 
-Run `wpfpilot-mcp` in a terminal to confirm the command exists. Then restart the MCP client and check its MCP logs.
+Run `npx -y @skuzadev/wpfpilot-mcp` in a terminal to confirm the command works. Then restart the MCP client and check its MCP logs.
 
 Windows app cannot be controlled
 

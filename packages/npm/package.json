@@ -1,0 +1,44 @@
+{
+  "name": "@skuzadev/wpfpilot-mcp",
+  "version": "0.1.0",
+  "description": "npx launcher for WpfPilot MCP, a local MCP server for Windows WPF automation.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "wpfpilot-mcp": "./bin/wpfpilot-mcp.js"
+  },
+  "files": [
+    "bin/",
+    "README.md",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "win32"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "wpf",
+    "automation",
+    "flaui",
+    "testing"
+  ],
+  "dependencies": {
+    "unzip-stream": "^0.3.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skuzadev/wpfpilot-mcp.git",
+    "directory": "packages/npm"
+  },
+  "bugs": {
+    "url": "https://github.com/skuzadev/wpfpilot-mcp/issues"
+  },
+  "homepage": "https://github.com/skuzadev/wpfpilot-mcp#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}

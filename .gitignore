@@ -1,5 +1,9 @@
 bin/
 obj/
 artifacts/
+node_modules/
+!packages/npm/bin/
+!packages/npm/bin/wpfpilot-mcp.js
 *.nupkg
 *.snupkg
+*.tgz

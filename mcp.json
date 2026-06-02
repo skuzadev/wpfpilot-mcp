@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "wpfpilot-mcp": {
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }

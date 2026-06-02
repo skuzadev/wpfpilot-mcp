@@ -9,13 +9,21 @@ WpfPilot MCP is a local Model Context Protocol server for Windows WPF applicatio
 
 ## Install
 
-Recommended install, no source checkout or build required:
+Recommended install for MCP clients, no source checkout or build required:
+
+```powershell
+npx -y @skuzadev/wpfpilot-mcp
+```
+
+The npm launcher downloads the latest Windows release binary on first run and then proxies stdio to it.
+
+Prefer installing a persistent `wpfpilot-mcp` command?
 
 ```powershell
 irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
 ```
 
-Verify the command is available:
+Verify the installed command is available:
 
 ```powershell
 wpfpilot-mcp
@@ -45,14 +53,14 @@ Manual install: download `wpfpilot-mcp-win-x64.zip` from the GitHub Releases pag
 
 ## Configure Your MCP Client
 
-Most clients need the same stdio server definition:
+Most clients can use the npm launcher directly:
 
 ```json
 {
   "mcpServers": {
     "wpfpilot-mcp": {
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -68,8 +76,8 @@ Open Claude Desktop -> Settings -> Developer -> Edit Config, then add:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -86,14 +94,14 @@ Restart Claude Desktop after saving.
 ### Claude Code
 
 ```powershell
-claude mcp add --transport stdio wpfpilot-mcp -- wpfpilot-mcp
+claude mcp add --transport stdio wpfpilot-mcp -- npx -y @skuzadev/wpfpilot-mcp
 claude mcp list
 ```
 
 ### Codex CLI
 
 ```powershell
-codex mcp add wpfpilot-mcp -- wpfpilot-mcp
+codex mcp add wpfpilot-mcp -- npx -y @skuzadev/wpfpilot-mcp
 codex mcp list
 ```
 
@@ -101,8 +109,8 @@ Equivalent `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.wpfpilot-mcp]
-command = "wpfpilot-mcp"
-args = []
+command = "npx"
+args = ["-y", "@skuzadev/wpfpilot-mcp"]
 enabled = true
 startup_timeout_sec = 30
 tool_timeout_sec = 60
@@ -116,8 +124,8 @@ Create or edit `.cursor/mcp.json` in your project, or `~/.cursor/mcp.json` globa
 {
   "mcpServers": {
     "wpfpilot-mcp": {
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -132,8 +140,8 @@ Create `.vscode/mcp.json`:
   "servers": {
     "wpfpilot-mcp": {
       "type": "stdio",
-      "command": "wpfpilot-mcp",
-      "args": []
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
@@ -238,6 +246,13 @@ Compress-Archive -Path artifacts/wpfpilot-mcp-win-x64/* -DestinationPath artifac
 ```
 
 Tagging `vX.Y.Z` runs the release workflow and uploads the Windows zip.
+
+Publish the npm launcher:
+
+```powershell
+cd packages/npm
+npm publish --access public
+```
 
 ## Development From Source
 
