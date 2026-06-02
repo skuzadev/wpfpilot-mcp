@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "wpfpilot-mcp": {
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "src/WpfPilot.Mcp.Server/WpfPilot.Mcp.Server.csproj"
+      ]
+    }
+  }
+}
