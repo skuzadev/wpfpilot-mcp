@@ -53,7 +53,7 @@ Manual install: download `wpfpilot-mcp-win-x64.zip` from the GitHub Releases pag
 
 ## Configure Your MCP Client
 
-Most clients can use the npm launcher directly:
+Most clients can run WpfPilot through npm:
 
 ```json
 {
@@ -66,22 +66,10 @@ Most clients can use the npm launcher directly:
 }
 ```
 
-For a full client matrix, see [docs/all-clients.md](docs/all-clients.md).
+<details>
+<summary>Claude Desktop</summary>
 
-### Claude Desktop
-
-Open Claude Desktop -> Settings -> Developer -> Edit Config, then add:
-
-```json
-{
-  "mcpServers": {
-    "wpfpilot-mcp": {
-      "command": "npx",
-      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
-    }
-  }
-}
-```
+Open Claude Desktop -> Settings -> Developer -> Edit Config.
 
 Windows config path:
 
@@ -89,16 +77,49 @@ Windows config path:
 %APPDATA%\Claude\claude_desktop_config.json
 ```
 
+Add:
+
+```json
+{
+  "mcpServers": {
+    "wpfpilot-mcp": {
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
+    }
+  }
+}
+```
+
 Restart Claude Desktop after saving.
 
-### Claude Code
+</details>
+
+<details>
+<summary>Claude Code</summary>
 
 ```powershell
 claude mcp add --transport stdio wpfpilot-mcp -- npx -y @skuzadev/wpfpilot-mcp
 claude mcp list
 ```
 
-### Codex CLI
+Project-scoped `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "wpfpilot-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>Codex CLI</summary>
 
 ```powershell
 codex mcp add wpfpilot-mcp -- npx -y @skuzadev/wpfpilot-mcp
@@ -116,9 +137,24 @@ startup_timeout_sec = 30
 tool_timeout_sec = 60
 ```
 
-### Cursor
+</details>
 
-Create or edit `.cursor/mcp.json` in your project, or `~/.cursor/mcp.json` globally:
+<details>
+<summary>Cursor</summary>
+
+Global config:
+
+```text
+~/.cursor/mcp.json
+```
+
+Project config:
+
+```text
+.cursor/mcp.json
+```
+
+Config:
 
 ```json
 {
@@ -131,7 +167,17 @@ Create or edit `.cursor/mcp.json` in your project, or `~/.cursor/mcp.json` globa
 }
 ```
 
-### VS Code
+Optional checks:
+
+```powershell
+cursor-agent mcp list
+cursor-agent mcp list-tools wpfpilot-mcp
+```
+
+</details>
+
+<details>
+<summary>VS Code</summary>
 
 Create `.vscode/mcp.json`:
 
@@ -146,6 +192,129 @@ Create `.vscode/mcp.json`:
   }
 }
 ```
+
+</details>
+
+<details>
+<summary>Cline</summary>
+
+Use the Cline MCP server configuration UI and add:
+
+```json
+{
+  "mcpServers": {
+    "wpfpilot-mcp": {
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>Continue</summary>
+
+Add to your Continue MCP configuration:
+
+```json
+{
+  "mcpServers": [
+    {
+      "name": "wpfpilot-mcp",
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
+    }
+  ]
+}
+```
+
+</details>
+
+<details>
+<summary>Windsurf</summary>
+
+Add a local stdio MCP server:
+
+```json
+{
+  "mcpServers": {
+    "wpfpilot-mcp": {
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>Zed</summary>
+
+Add to `settings.json`:
+
+```json
+{
+  "context_servers": {
+    "wpfpilot-mcp": {
+      "source": "custom",
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>JetBrains AI Assistant</summary>
+
+In JetBrains IDEs:
+
+1. Open Settings.
+2. Go to Tools -> AI Assistant -> Model Context Protocol (MCP).
+3. Click Add.
+4. Select STDIO.
+5. Use command `npx` with arguments `-y @skuzadev/wpfpilot-mcp`.
+
+JSON form:
+
+```json
+{
+  "mcpServers": {
+    "wpfpilot-mcp": {
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>Visual Studio</summary>
+
+For Visual Studio MCP configuration that uses the `servers` shape:
+
+```json
+{
+  "servers": {
+    "wpfpilot-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
+    }
+  }
+}
+```
+
+</details>
+
+If a client cannot run `npx`, use the persistent installer and set the command to `wpfpilot-mcp`, or use the full path to `wpfpilot-mcp.exe` from a GitHub Release zip. For the expanded client guide, see [docs/all-clients.md](docs/all-clients.md).
 
 ## First Prompt
 
