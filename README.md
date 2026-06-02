@@ -12,7 +12,7 @@ WpfPilot MCP is a local Model Context Protocol server for Windows WPF applicatio
 Recommended install, no source checkout or build required:
 
 ```powershell
-irm https://raw.githubusercontent.com/styleben/wpfpilot-mcp/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
 ```
 
 Verify the command is available:
@@ -26,7 +26,7 @@ The server uses MCP over stdio, so it will wait for a client when run directly.
 Upgrade later:
 
 ```powershell
-irm https://raw.githubusercontent.com/styleben/wpfpilot-mcp/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
 ```
 
 Uninstall:

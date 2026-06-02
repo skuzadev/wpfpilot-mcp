@@ -7,13 +7,13 @@ Installation examples for MCP clients.
 Install the MCP server once, no source checkout or build required:
 
 ```powershell
-irm https://raw.githubusercontent.com/styleben/wpfpilot-mcp/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
 ```
 
 Upgrade:
 
 ```powershell
-irm https://raw.githubusercontent.com/styleben/wpfpilot-mcp/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
 ```
 
 Verify:

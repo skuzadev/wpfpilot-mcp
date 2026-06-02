@@ -1,5 +1,5 @@
 param(
-    [string]$Repo = "styleben/wpfpilot-mcp",
+    [string]$Repo = "skuzadev/wpfpilot-mcp",
     [string]$Version = "latest",
     [string]$InstallDir = "$env:LOCALAPPDATA\WpfPilot\bin"
 )
