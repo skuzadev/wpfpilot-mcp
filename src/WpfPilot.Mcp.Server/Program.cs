@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 using WpfPilot.Mcp.Core.Constants;
 using WpfPilot.Mcp.Server.Services;
-using WpfPilot.Mcp.Server.Tools;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -23,15 +22,20 @@ builder.Services.AddSingleton<DevWatcherService>();
 builder.Services.AddSingleton<ErrorMapper>();
 builder.Services.AddSingleton<UiActionEngine>();
 
-builder.Services.AddMcpServer(options =>
-{
-    options.ServerInfo = new()
+var mcp = builder.Services
+    .AddMcpServer(options =>
     {
-        Name = "WpfPilot MCP",
-        Version = Versions.ServerVersion
-    };
-})
-.WithStdioServerTransport()
-.WithToolsFromAssembly();
+        options.ServerInfo = new()
+        {
+            Name = "WpfPilot MCP",
+            Version = Versions.ServerVersion
+        };
+    })
+    .WithStdioServerTransport();
+
+if (string.Equals(Environment.GetEnvironmentVariable("WPFPILOT_MCP_TOOLS"), "full", StringComparison.OrdinalIgnoreCase))
+    mcp.WithToolsFromAssembly();
+else
+    mcp.WithDefaultWpfPilotTools();
 
 await builder.Build().RunAsync();

@@ -80,11 +80,7 @@ public class LiveAppTests : IDisposable
     {
         Skip.IfNot(_session.IsAttached, "Could not attach to test application");
         var tools = new QueryTools(_uia, _audit);
-        var result = tools.Query(new QueryRequest
-        {
-            Kind = "existence",
-            Selector = new() { ControlType = "Button" }
-        });
+        var result = tools.Query("existence", controlType: "Button");
         var json = JsonDocument.Parse(result);
         Assert.True(json.RootElement.GetProperty("exists").GetBoolean());
     }
@@ -94,12 +90,7 @@ public class LiveAppTests : IDisposable
     {
         Skip.IfNot(_session.IsAttached, "Could not attach to test application");
         var tools = new WaitTools(_uia, _session, _audit);
-        var result = tools.Wait(new WaitRequest
-        {
-            Condition = "exists",
-            Selector = new() { ControlType = "Button" },
-            TimeoutMs = 10000
-        });
+        var result = tools.Wait("exists", controlType: "Button", timeoutMs: 10000);
         var json = JsonDocument.Parse(result);
         Assert.True(json.RootElement.GetProperty("met").GetBoolean());
     }

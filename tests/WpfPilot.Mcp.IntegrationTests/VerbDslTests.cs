@@ -1,5 +1,4 @@
 using System.Text.Json;
-using WpfPilot.Mcp.Core.Dsl;
 using WpfPilot.Mcp.Server.Services;
 using WpfPilot.Mcp.Server.Tools;
 
@@ -29,6 +28,8 @@ public class VerbDslTests
         Assert.Equal("3.0", json.RootElement.GetProperty("protocolVersion").GetString());
         Assert.True(json.RootElement.GetProperty("verbs").GetArrayLength() > 0);
         Assert.True(json.RootElement.GetProperty("queryKinds").GetArrayLength() > 0);
+        Assert.Equal(39, json.RootElement.GetProperty("meta").GetProperty("registeredToolCount").GetInt32());
+        Assert.Equal(39, json.RootElement.GetProperty("tools").GetArrayLength());
         Assert.False(json.RootElement.TryGetProperty("deprecated", out _));
     }
 
@@ -36,7 +37,7 @@ public class VerbDslTests
     public void Act_DryRun_DoesNotRequireAttachment()
     {
         var tools = new ActTools(_uia, _audit, _recording, _errors, _actions);
-        var result = tools.Act(new ActionRequest { Verb = "click", DryRun = true, Selector = new() { AutomationId = "x" } });
+        var result = tools.Act("click", automationId: "x", dryRun: true);
         var json = JsonDocument.Parse(result);
         Assert.True(json.RootElement.GetProperty("dryRun").GetBoolean());
     }
@@ -45,7 +46,7 @@ public class VerbDslTests
     public void Act_UnknownVerb_ReturnsStructuredError()
     {
         var tools = new ActTools(_uia, _audit, _recording, _errors, _actions);
-        var result = tools.Act(new ActionRequest { Verb = "not_a_verb" });
+        var result = tools.Act("not_a_verb");
         var json = JsonDocument.Parse(result);
         Assert.Equal("invalid_args", json.RootElement.GetProperty("error").GetProperty("code").GetString());
     }
@@ -54,7 +55,7 @@ public class VerbDslTests
     public void Query_UnknownKind_ReturnsStructuredError()
     {
         var tools = new QueryTools(_uia, _audit);
-        var result = tools.Query(new QueryRequest { Kind = "nope", Selector = new() { Name = "a" } });
+        var result = tools.Query("nope", name: "a");
         var json = JsonDocument.Parse(result);
         Assert.Equal("invalid_args", json.RootElement.GetProperty("error").GetProperty("code").GetString());
     }
@@ -63,7 +64,7 @@ public class VerbDslTests
     public void Wait_UnknownCondition_ReturnsStructuredError()
     {
         var tools = new WaitTools(_uia, _session, _audit);
-        var result = tools.Wait(new WaitRequest { Condition = "nope" });
+        var result = tools.Wait("nope");
         var json = JsonDocument.Parse(result);
         Assert.Equal("invalid_args", json.RootElement.GetProperty("error").GetProperty("code").GetString());
     }
@@ -72,7 +73,7 @@ public class VerbDslTests
     public void Assert_UnknownCondition_ReturnsFail()
     {
         var tools = new AssertionTools(_uia, _audit);
-        var result = tools.Assert(new AssertRequest { Condition = "nope" });
+        var result = tools.Assert("nope");
         var json = JsonDocument.Parse(result);
         Assert.Equal("fail", json.RootElement.GetProperty("assertion").GetString());
     }

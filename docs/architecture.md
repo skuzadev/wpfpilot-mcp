@@ -153,7 +153,11 @@ Thread-safe action logging:
 
 ## Tool Registration
 
-Tools are discovered automatically via `WithToolsFromAssembly()`. Each tool class:
+By default the server registers **39 curated tools** from [`DefaultMcpTools`](../src/WpfPilot.Mcp.Server/Services/DefaultMcpTools.cs) via filtered `McpServerTool.Create` registration ([`McpToolRegistration`](../src/WpfPilot.Mcp.Server/Services/McpToolRegistration.cs)). Verb tools (`wpf_act`, `wpf_query`, `wpf_wait`, `wpf_assert`) use flat MCP parameters to avoid JSON Schema `$ref` issues in clients.
+
+Set `WPFPILOT_MCP_TOOLS=full` only for maintainer debugging; that enables `WithToolsFromAssembly()` (~90 tools) and may break Cursor, Claude, and Codex.
+
+Each tool class:
 
 1. Has `[McpServerToolType]` attribute
 2. Receives services via constructor injection

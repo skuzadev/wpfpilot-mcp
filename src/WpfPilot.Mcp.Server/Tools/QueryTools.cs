@@ -22,16 +22,22 @@ public sealed class QueryTools
     }
 
     [McpServerTool(Name = "wpf_query"),
-     Description("Generic verb-driven read. Examples: " +
-        "wpf_query(kind='text', selector={automationId:'lblStatus'}) | " +
-        "wpf_query(kind='bounds', selector={name:'Submit'}) | " +
-        "wpf_query(kind='state', selector={controlType:'CheckBox', name:'RememberMe'}) | " +
-        "wpf_query(kind='children', selector={controlType:'DataGrid'}, maxDepth=2) | " +
-        "wpf_query(kind='existence', selector={automationId:'btnSave'}) | " +
-        "wpf_query(kind='find', selector={controlType:'Button', name:'Save'}) | " +
-        "wpf_query(kind='find_all', selector={controlType:'ListItem'})")]
-    public string Query(QueryRequest request)
+     Description("Generic verb-driven read. Pass selector fields flat (automationId, name, controlType, className, path). Examples: " +
+        "kind=text, automationId=lblStatus | kind=bounds, name=Submit | kind=children, controlType=DataGrid, maxDepth=2")]
+    public string Query(
+        string kind,
+        string? automationId = null,
+        string? name = null,
+        string? controlType = null,
+        string? className = null,
+        string? path = null,
+        int? maxDepth = null,
+        int? limit = null,
+        string? nearAutomationId = null,
+        string? nearName = null)
     {
+        var request = McpSelectorParams.ToQueryRequest(
+            kind, automationId, name, controlType, className, path, maxDepth, limit, nearAutomationId, nearName);
         var sw = Stopwatch.StartNew();
         _audit.Record("wpf_query", request.Selector, request.Path, new Dictionary<string, object?>
         {
@@ -40,13 +46,13 @@ public sealed class QueryTools
             ["limit"] = request.Limit
         });
 
-        if (!QueryKindCatalog.TryParse(request.Kind, out var kind))
+        if (!QueryKindCatalog.TryParse(request.Kind, out var queryKind))
             return ToolJson.Error(ErrorCodes.InvalidArgs, $"Unknown kind: '{request.Kind}'. Use wpf_capabilities to list valid kinds.");
 
         try
         {
             var element = ResolveElement(request);
-            return kind switch
+            return queryKind switch
             {
                 QueryKind.Text => QueryText(element),
                 QueryKind.Value => QueryValue(element),
@@ -62,12 +68,12 @@ public sealed class QueryTools
                 QueryKind.Count => Count(request, element),
                 QueryKind.Find => FindFirst(request),
                 QueryKind.FindAll => FindAll(request),
-                _ => ToolJson.Error(ErrorCodes.InvalidArgs, $"Kind '{kind}' not implemented yet")
+                _ => ToolJson.Error(ErrorCodes.InvalidArgs, $"Kind '{queryKind}' not implemented yet")
             };
         }
         catch (Exception ex)
         {
-            return ToolJson.Error(ErrorCodes.Internal, $"wpf_query({kind}) failed: {ex.Message}", ex.ToString());
+            return ToolJson.Error(ErrorCodes.Internal, $"wpf_query({queryKind}) failed: {ex.Message}", ex.ToString());
         }
     }
 

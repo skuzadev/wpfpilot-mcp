@@ -22,11 +22,24 @@ public sealed class WaitTools
     }
 
     [McpServerTool(Name = "wpf_wait"),
-     Description("Wait until a UI condition is met. Use wpf_capabilities for conditions. " +
-        "Examples: wpf_wait(condition='exists', selector={automationId:'btnSave'}, timeoutMs=10000) | " +
-        "wpf_wait(condition='has_text', selector={name:'lblStatus'}, value='Ready')")]
-    public string Wait(WaitRequest request)
+     Description("Wait until a UI condition is met. Use wpf_capabilities for conditions. Pass selector fields flat. " +
+        "Examples: condition=exists, automationId=btnSave, timeoutMs=10000 | condition=has_text, name=lblStatus, value=Ready")]
+    public string Wait(
+        string condition,
+        string? automationId = null,
+        string? name = null,
+        string? controlType = null,
+        string? className = null,
+        string? path = null,
+        string? value = null,
+        int timeoutMs = 5000,
+        int pollIntervalMs = 100,
+        string? nearAutomationId = null,
+        string? nearName = null)
     {
+        var request = McpSelectorParams.ToWaitRequest(
+            condition, automationId, name, controlType, className, path, value,
+            timeoutMs, pollIntervalMs, nearAutomationId, nearName);
         _audit.Record("wpf_wait", request.Selector, request.Path, new Dictionary<string, object?>
         {
             ["condition"] = request.Condition,

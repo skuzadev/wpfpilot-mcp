@@ -29,15 +29,41 @@ public sealed class ActTools
     }
 
     [McpServerTool(Name = "wpf_act"),
-     Description("Generic verb-driven action. Use wpf_capabilities to list verbs. Examples: " +
-        "wpf_act(verb='click', selector={automationId:'btnSave'}) | " +
-        "wpf_act(verb='set_value', selector={name:'Username'}, value='alice') | " +
-        "wpf_act(verb='select_by_text', parentSelector={automationId:'cmbRole'}, text='Admin') | " +
-        "wpf_act(verb='open_menu', menuPath='File>Recent>Doc1') | " +
-        "wpf_act(verb='drag_drop', sourceAutomationId='a', targetAutomationId='b') | " +
-        "wpf_act(verb='set_slider', selector={automationId:'vol'}, value='75')")]
-    public string Act(ActionRequest request)
+     Description("Generic verb-driven action. Use wpf_capabilities to list verbs. Pass selector fields flat (automationId, name, controlType, className, path). Examples: " +
+        "verb=click, automationId=btnSave | verb=set_value, name=Username, value=alice | " +
+        "verb=select_by_text, parentAutomationId=cmbRole, text=Admin | verb=open_menu, menuPath=File>Recent>Doc1")]
+    public string Act(
+        string verb,
+        string? automationId = null,
+        string? name = null,
+        string? controlType = null,
+        string? className = null,
+        string? path = null,
+        string? parentAutomationId = null,
+        string? parentName = null,
+        string? parentControlType = null,
+        string? parentPath = null,
+        string? value = null,
+        int? index = null,
+        string? text = null,
+        string? menuPath = null,
+        string? menuItem = null,
+        string? sourceAutomationId = null,
+        string? targetAutomationId = null,
+        string? keys = null,
+        string? direction = null,
+        double? amount = null,
+        bool dryRun = false,
+        int? timeoutMs = null,
+        string? nearAutomationId = null,
+        string? nearName = null)
     {
+        var request = McpSelectorParams.ToActionRequest(
+            verb, automationId, name, controlType, className, path,
+            parentAutomationId, parentName, parentControlType, parentPath,
+            value, index, text, menuPath, menuItem,
+            sourceAutomationId, targetAutomationId, keys, direction, amount,
+            dryRun, timeoutMs, nearAutomationId, nearName);
         var stopwatch = Stopwatch.StartNew();
         var auditParams = new Dictionary<string, object?>
         {
@@ -69,12 +95,12 @@ public sealed class ActTools
             });
         }
 
-        if (!ActionVerbCatalog.TryParse(request.Verb, out var verb))
+        if (!ActionVerbCatalog.TryParse(request.Verb, out var actionVerb))
             return ToolJson.Error(ErrorCodes.InvalidArgs, $"Unknown verb: '{request.Verb}'. Use wpf_capabilities to list valid verbs.");
 
         try
         {
-            return verb switch
+            return actionVerb switch
             {
                 ActionVerb.Click => DoClick(request),
                 ActionVerb.DoubleClick => DoDoubleClick(request),
@@ -103,12 +129,12 @@ public sealed class ActTools
                 ActionVerb.SetDate => DoWithElement(request, SetValue, request.Value, "set_date"),
                 ActionVerb.AcceptDialog => _actions.AcceptDialog(),
                 ActionVerb.CancelDialog => _actions.CancelDialog(),
-                _ => ToolJson.Error(ErrorCodes.InvalidArgs, $"Verb '{verb}' not implemented yet")
+                _ => ToolJson.Error(ErrorCodes.InvalidArgs, $"Verb '{actionVerb}' not implemented yet")
             };
         }
         catch (Exception ex)
         {
-            var info = _errors.FromUiaException($"wpf_act({verb})", ex);
+            var info = _errors.FromUiaException($"wpf_act({actionVerb})", ex);
             _audit.Record("wpf_act", result: "error", error: info.Message, durationMs: stopwatch.ElapsedMilliseconds);
             return ToolJson.Error(info);
         }

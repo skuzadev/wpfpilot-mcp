@@ -44,7 +44,7 @@ public class UnattachedErrorTests
     public void Query_Find_ReturnsError_WhenNotAttached()
     {
         var tools = new QueryTools(_uia, _audit);
-        var result = tools.Query(new QueryRequest { Kind = "find", Selector = new() { Name = "Save" } });
+        var result = tools.Query("find", name: "Save");
         var json = JsonDocument.Parse(result);
         Assert.True(json.RootElement.TryGetProperty("error", out var err));
         Assert.True(err.TryGetProperty("code", out _) || err.ValueKind == JsonValueKind.String);
@@ -54,7 +54,7 @@ public class UnattachedErrorTests
     public void Act_Click_ReturnsError_WhenNotAttached()
     {
         var tools = new ActTools(_uia, _audit, _recording, _errors, _actions);
-        var result = tools.Act(new ActionRequest { Verb = "click", Selector = new() { AutomationId = "btn" } });
+        var result = tools.Act("click", automationId: "btn");
         var json = JsonDocument.Parse(result);
         Assert.True(json.RootElement.TryGetProperty("error", out _));
     }

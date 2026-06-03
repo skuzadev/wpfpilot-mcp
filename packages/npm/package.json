@@ -1,6 +1,6 @@
 {
   "name": "@skuzadev/wpfpilot-mcp",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "npx launcher for WpfPilot MCP, a local MCP server for Windows WPF automation.",
   "mcpName": "io.github.skuzadev/wpfpilot-mcp",
   "license": "MIT",

@@ -8,7 +8,7 @@
     <RootNamespace>WpfPilot.Mcp.Server</RootNamespace>
     <UseWindowsForms>true</UseWindowsForms>
     <PackageId>WpfPilot.Mcp.Server</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>WpfPilot MCP Contributors</Authors>
     <Description>Local MCP server for inspecting, automating, and testing Windows WPF applications.</Description>
     <PackageTags>mcp;wpf;automation;testing;flaui</PackageTags>

@@ -44,20 +44,39 @@ Download `wpfpilot-mcp-win-x64.zip` from [GitHub Releases](https://github.com/sk
 
 If a client cannot run `npx`, use the persistent installer (`command`: `wpfpilot-mcp`) or a release zip path instead.
 
-## Generic STDIO Configuration
+## Standard MCP configuration
 
-Use this shape for clients that accept JSON MCP server configuration:
+Use this for **all** clients (Cursor, Claude, Codex, VS Code, etc.). Include `"type": "stdio"` for compatibility (recommended); some clients also work without it when `command` + `args` imply stdio.
+
+**npm (recommended):**
 
 ```json
 {
   "mcpServers": {
     "wpfpilot-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
   }
 }
 ```
+
+**Local binary** (after `npx` has cached once, or after [install script](#install-wpfpilot) / release zip):
+
+```json
+{
+  "mcpServers": {
+    "wpfpilot-mcp": {
+      "type": "stdio",
+      "command": "C:\\Users\\YOU\\AppData\\Local\\WpfPilot\\npm\\wpfpilot-mcp.exe",
+      "args": []
+    }
+  }
+}
+```
+
+Restart or reload the MCP client after changing config.
 
 ## Claude Desktop
 
@@ -81,6 +100,7 @@ Config:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
@@ -97,19 +117,7 @@ claude mcp add --transport stdio wpfpilot-mcp -- npx -y @skuzadev/wpfpilot-mcp
 claude mcp list
 ```
 
-Project-scoped `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "wpfpilot-mcp": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
-    }
-  }
-}
-```
+Project-scoped `.mcp.json`: same JSON as [Standard MCP configuration](#standard-mcp-configuration).
 
 ## Codex
 
@@ -131,30 +139,7 @@ tool_timeout_sec = 60
 
 ## Cursor
 
-Global config:
-
-```text
-~/.cursor/mcp.json
-```
-
-Project config:
-
-```text
-.cursor/mcp.json
-```
-
-Config:
-
-```json
-{
-  "mcpServers": {
-    "wpfpilot-mcp": {
-      "command": "npx",
-      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
-    }
-  }
-}
-```
+Config file: `~/.cursor/mcp.json` — use the [Standard MCP configuration](#standard-mcp-configuration) only. Avoid a repo `.cursor/mcp.json` unless you intentionally override global settings.
 
 Optional checks:
 
@@ -179,6 +164,8 @@ Create `.vscode/mcp.json`:
 }
 ```
 
+(VS Code uses the `servers` key; other clients use `mcpServers` as above.)
+
 ## Cline
 
 Use the Cline MCP server configuration UI and add:
@@ -187,6 +174,7 @@ Use the Cline MCP server configuration UI and add:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
@@ -203,6 +191,7 @@ Add to your Continue MCP configuration:
   "mcpServers": [
     {
       "name": "wpfpilot-mcp",
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
@@ -218,6 +207,7 @@ Add a local stdio MCP server:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
@@ -257,6 +247,7 @@ JSON form:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
@@ -288,6 +279,7 @@ If a client cannot find global .NET tools on PATH, use the full executable path 
 {
   "mcpServers": {
     "wpfpilot-mcp": {
+      "type": "stdio",
       "command": "C:\\Tools\\wpfpilot-mcp\\wpfpilot-mcp.exe",
       "args": []
     }
@@ -303,7 +295,10 @@ Install Node.js, restart the terminal or MCP client, or use the persistent insta
 
 The server starts but the client shows no tools
 
-Run `npx -y @skuzadev/wpfpilot-mcp` in a terminal to confirm the command works. Then restart the MCP client and check its MCP logs.
+1. Use the [Standard MCP configuration](#standard-mcp-configuration); remove duplicate or conflicting MCP config (e.g. a repo `.cursor/mcp.json` that overrides global settings).
+2. Reload the client and check **Output → MCP Logs** (Cursor) for `tools/list` errors.
+3. The server registers **39 default tools** (verb DSL + session, snapshot, screenshot, selectors, probe, recording, diagnostics). Do not set `WPFPILOT_MCP_TOOLS=full` unless you are debugging the server — the full assembly (~90 tools) breaks many MCP clients.
+4. Run `npx -y @skuzadev/wpfpilot-mcp` in a terminal to confirm the launcher starts (waits on stdin; that is normal).
 
 Windows app cannot be controlled
 

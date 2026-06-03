@@ -19,9 +19,21 @@ public sealed class AssertionTools
     }
 
     [McpServerTool(Name = "wpf_assert"),
-     Description("Assert a UI condition. Returns {assertion:'pass'|'fail', message}. Use wpf_capabilities for conditions.")]
-    public string Assert(AssertRequest request)
+     Description("Assert a UI condition. Returns {assertion:'pass'|'fail', message}. Pass selector fields flat. Use wpf_capabilities for conditions.")]
+    public string Assert(
+        string condition,
+        string? automationId = null,
+        string? name = null,
+        string? controlType = null,
+        string? className = null,
+        string? path = null,
+        string? expected = null,
+        string? value = null,
+        string? nearAutomationId = null,
+        string? nearName = null)
     {
+        var request = McpSelectorParams.ToAssertRequest(
+            condition, automationId, name, controlType, className, path, expected, value, nearAutomationId, nearName);
         _audit.Record("wpf_assert", request.Selector, request.Path, new Dictionary<string, object?>
         {
             ["condition"] = request.Condition,

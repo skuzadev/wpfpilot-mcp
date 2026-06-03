@@ -32,6 +32,7 @@ Add this to your MCP client configuration (global or project-scoped):
 {
   "mcpServers": {
     "wpfpilot-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
@@ -56,12 +57,13 @@ Use the [standard config](#getting-started) above unless noted. More clients: [d
 <details>
 <summary>Cursor</summary>
 
-Global: `~/.cursor/mcp.json` — project: `.cursor/mcp.json`
+Global: `~/.cursor/mcp.json` (do not add a project `.cursor/mcp.json` unless you need a repo-specific override)
 
 ```json
 {
   "mcpServers": {
     "wpfpilot-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }
@@ -132,6 +134,7 @@ Windows config: `%APPDATA%\Claude\claude_desktop_config.json`
 {
   "mcpServers": {
     "wpfpilot-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }

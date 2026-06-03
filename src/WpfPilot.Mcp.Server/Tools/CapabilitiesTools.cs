@@ -27,24 +27,7 @@ public sealed class CapabilitiesTools
             Verbs = ActionVerbCatalog.ByName.Keys.OrderBy(k => k).ToList(),
             QueryKinds = QueryKindCatalog.ByName.Keys.OrderBy(k => k).ToList(),
             WaitConditions = WaitConditionCatalog.ByName.Keys.OrderBy(k => k).ToList(),
-            Tools =
-            [
-                new() { Name = "wpf_capabilities", Description = "This document.", Category = "meta" },
-                new() { Name = "wpf_act", Description = "Verb-driven UI actions.", Category = "verb-dsl" },
-                new() { Name = "wpf_query", Description = "Verb-driven UI reads.", Category = "verb-dsl" },
-                new() { Name = "wpf_wait", Description = "Verb-driven waits.", Category = "verb-dsl" },
-                new() { Name = "wpf_assert", Description = "Verb-driven assertions.", Category = "verb-dsl" },
-                new() { Name = "wpf_attach", Description = "Attach to a process.", Category = "session" },
-                new() { Name = "wpf_detach", Description = "Detach session.", Category = "session" },
-                new() { Name = "wpf_launch_app", Description = "Launch and attach.", Category = "session" },
-                new() { Name = "wpf_list_apps", Description = "List desktop apps with windows.", Category = "session" },
-                new() { Name = "wpf_snapshot", Description = "UI tree snapshot.", Category = "discovery" },
-                new() { Name = "wpf_build_selector", Description = "Build stable selector.", Category = "selectors" },
-                new() { Name = "wpf_record_start", Description = "Start workflow recording.", Category = "recording" },
-                new() { Name = "wpf_export_test", Description = "Export recording as test code.", Category = "recording" },
-                new() { Name = "wpf_why_disabled", Description = "Explain disabled control (probe optional).", Category = "diagnostics" },
-                new() { Name = "wpf_screenshot", Description = "Capture screenshot.", Category = "capture" }
-            ]
+            Tools = DefaultMcpTools.Descriptors.ToList()
         };
 
         return ToolJson.Ok(new
@@ -58,9 +41,11 @@ public sealed class CapabilitiesTools
             meta = new
             {
                 recording = _recording.IsRecording ? "recording" : "idle",
+                registeredToolCount = DefaultMcpTools.Count,
                 totalVerbs = cap.Verbs.Count,
                 totalQueryKinds = cap.QueryKinds.Count,
-                totalWaitConditions = cap.WaitConditions.Count
+                totalWaitConditions = cap.WaitConditions.Count,
+                extendedTools = "Set WPFPILOT_MCP_TOOLS=full for all tools (maintainers only; may break some clients)."
             }
         });
     }

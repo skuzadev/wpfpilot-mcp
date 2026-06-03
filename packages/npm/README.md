@@ -12,6 +12,7 @@ MCP config:
 {
   "mcpServers": {
     "wpfpilot-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@skuzadev/wpfpilot-mcp"]
     }

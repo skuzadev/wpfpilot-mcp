@@ -319,12 +319,12 @@ public abstract class UiTestBase : IDisposable
             or "DataItem" or "TreeItem" or "Slider" or "Hyperlink";
     }
 
-    [McpServerTool(Name = "wpf_export_test"),
+    [McpServerTool(Name = "wpf_export_test_roslyn"),
      Description("Export the current recording as a runnable C# test class using the Roslyn-based generator. " +
-        "Returns the generated code plus any compiler diagnostics. Use this instead of the legacy string-built export.")]
-    public string ExportTest(string? framework = null)
+        "Returns the generated code plus any compiler diagnostics.")]
+    public string ExportTestRoslyn(string? framework = null)
     {
-        _audit.Record("wpf_export_test");
+        _audit.Record("wpf_export_test_roslyn");
         var recording = _recording.ActiveRecording;
         if (recording is null)
             return Error("No active recording. Start a recording first with wpf_record_start.");
