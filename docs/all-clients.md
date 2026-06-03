@@ -99,7 +99,7 @@ Project-scoped `.mcp.json`:
 }
 ```
 
-## Codex CLI
+## Codex
 
 ```powershell
 codex mcp add wpfpilot-mcp -- npx -y @skuzadev/wpfpilot-mcp

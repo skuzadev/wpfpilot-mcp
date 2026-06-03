@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.skuzadev/wpfpilot-mcp",
+  "title": "WpfPilot MCP",
+  "description": "Automate Windows WPF apps from AI agents with semantic UI Automation selectors, query/act/wait/assert tools, screenshots, workflow recording, and xUnit + FlaUI test generation.",
+  "repository": {
+    "url": "https://github.com/skuzadev/wpfpilot-mcp",
+    "source": "github"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@skuzadev/wpfpilot-mcp",
+      "version": "0.1.1",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
