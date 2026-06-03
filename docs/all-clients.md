@@ -1,24 +1,20 @@
 # WpfPilot MCP Clients
 
-Installation examples for MCP clients.
+Installation and per-client MCP configuration for WpfPilot.
 
 ## Install WpfPilot
 
-Run through npm, no source checkout or build required:
+### npm (recommended)
+
+No source checkout or .NET SDK required:
 
 ```powershell
 npx -y @skuzadev/wpfpilot-mcp
 ```
 
-The npm launcher downloads the latest Windows release binary on first run and caches it under `%LOCALAPPDATA%\WpfPilot\npm`.
+The npm launcher downloads the latest Windows release binary on first run and caches it under `%LOCALAPPDATA%\WpfPilot\npm`. The server uses MCP over stdio and waits for a client when run directly.
 
-Optional persistent command install:
-
-```powershell
-irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
-```
-
-Upgrade the persistent command:
+### Persistent command
 
 ```powershell
 irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
@@ -30,7 +26,23 @@ Verify:
 wpfpilot-mcp
 ```
 
-If you install from a GitHub Release zip manually, replace the npm command in the examples below with the full path to `wpfpilot-mcp.exe`.
+Upgrade (re-run the installer):
+
+```powershell
+irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
+```
+
+Uninstall:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\WpfPilot\bin\uninstall.ps1"
+```
+
+### GitHub Release zip
+
+Download `wpfpilot-mcp-win-x64.zip` from [GitHub Releases](https://github.com/skuzadev/wpfpilot-mcp/releases), extract it, and set your MCP client `command` to the full path of `wpfpilot-mcp.exe` with empty `args`. See [Using GitHub Release binaries](#using-github-release-binaries).
+
+If a client cannot run `npx`, use the persistent installer (`command`: `wpfpilot-mcp`) or a release zip path instead.
 
 ## Generic STDIO Configuration
 

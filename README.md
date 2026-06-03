@@ -7,53 +7,26 @@ WpfPilot MCP is a local Model Context Protocol server for Windows WPF applicatio
 [![Windows](https://img.shields.io/badge/platform-Windows-0078D4?logo=windows)](#requirements)
 [![License](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
 
-## Install
+## Features
 
-Recommended install for MCP clients, no source checkout or build required:
-
-```powershell
-npx -y @skuzadev/wpfpilot-mcp
-```
-
-The npm launcher downloads the latest Windows release binary on first run and then proxies stdio to it.
-
-Prefer installing a persistent `wpfpilot-mcp` command?
-
-```powershell
-irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
-```
-
-Verify the installed command is available:
-
-```powershell
-wpfpilot-mcp
-```
-
-The server uses MCP over stdio, so it will wait for a client when run directly.
-
-Upgrade later:
-
-```powershell
-irm https://raw.githubusercontent.com/skuzadev/wpfpilot-mcp/main/scripts/install.ps1 | iex
-```
-
-Uninstall:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\WpfPilot\bin\uninstall.ps1"
-```
-
-Manual install: download `wpfpilot-mcp-win-x64.zip` from the GitHub Releases page, extract it, and point your MCP client at `wpfpilot-mcp.exe`.
+- Attach to or launch WPF processes.
+- Capture semantic UI snapshots (selectors, not screen coordinates).
+- Query text, value, state, bounds, patterns, children, ancestors, siblings, and selection.
+- Act with verbs such as click, set value, select, toggle, expand, collapse, scroll, and drag/drop.
+- Wait and assert on UI state with structured errors.
+- Capture screenshots.
+- Record workflows and generate test code.
+- Optional in-process probe for ViewModel, binding, command, validation, and dispatcher diagnostics.
 
 ## Requirements
 
 - Windows 10/11.
 - A WPF application to automate.
-- No .NET SDK is required when using the installer or release zip.
+- Node.js 18+ if using `npx` (recommended). No .NET SDK required for the release binary or npm launcher.
 
-## Configure Your MCP Client
+## Getting started
 
-Most clients can run WpfPilot through npm:
+Add this to your MCP client configuration (global or project-scoped):
 
 ```json
 {
@@ -65,19 +38,25 @@ Most clients can run WpfPilot through npm:
   }
 }
 ```
+
+Or run directly (stdio; waits for an MCP client):
+
+```powershell
+npx -y @skuzadev/wpfpilot-mcp
+```
+
+The npm launcher downloads the latest Windows release binary on first run, then proxies stdio to it.
+
+**Other installs** (persistent `wpfpilot-mcp` command, release zip, uninstall): see [Install WpfPilot](docs/all-clients.md#install-wpfpilot).
+
+### Popular clients
+
+Use the [standard config](#getting-started) above unless noted. More clients: [docs/all-clients.md](docs/all-clients.md).
 
 <details>
-<summary>Claude Desktop</summary>
+<summary>Cursor</summary>
 
-Open Claude Desktop -> Settings -> Developer -> Edit Config.
-
-Windows config path:
-
-```text
-%APPDATA%\Claude\claude_desktop_config.json
-```
-
-Add:
+Global: `~/.cursor/mcp.json` — project: `.cursor/mcp.json`
 
 ```json
 {
@@ -90,7 +69,33 @@ Add:
 }
 ```
 
-Restart Claude Desktop after saving.
+Or: **Cursor Settings** → **MCP** → **Add new MCP Server** — command `npx`, args `-y @skuzadev/wpfpilot-mcp`.
+
+```powershell
+cursor-agent mcp list
+cursor-agent mcp list-tools wpfpilot-mcp
+```
+
+</details>
+
+<details>
+<summary>Codex</summary>
+
+```powershell
+codex mcp add wpfpilot-mcp -- npx -y @skuzadev/wpfpilot-mcp
+codex mcp list
+```
+
+Or `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.wpfpilot-mcp]
+command = "npx"
+args = ["-y", "@skuzadev/wpfpilot-mcp"]
+enabled = true
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+```
 
 </details>
 
@@ -102,7 +107,7 @@ claude mcp add --transport stdio wpfpilot-mcp -- npx -y @skuzadev/wpfpilot-mcp
 claude mcp list
 ```
 
-Project-scoped `.mcp.json`:
+Project `.mcp.json`:
 
 ```json
 {
@@ -119,42 +124,9 @@ Project-scoped `.mcp.json`:
 </details>
 
 <details>
-<summary>Codex</summary>
+<summary>Claude Desktop</summary>
 
-```powershell
-codex mcp add wpfpilot-mcp -- npx -y @skuzadev/wpfpilot-mcp
-codex mcp list
-```
-
-Equivalent `~/.codex/config.toml`:
-
-```toml
-[mcp_servers.wpfpilot-mcp]
-command = "npx"
-args = ["-y", "@skuzadev/wpfpilot-mcp"]
-enabled = true
-startup_timeout_sec = 30
-tool_timeout_sec = 60
-```
-
-</details>
-
-<details>
-<summary>Cursor</summary>
-
-Global config:
-
-```text
-~/.cursor/mcp.json
-```
-
-Project config:
-
-```text
-.cursor/mcp.json
-```
-
-Config:
+Windows config: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
@@ -167,12 +139,7 @@ Config:
 }
 ```
 
-Optional checks:
-
-```powershell
-cursor-agent mcp list
-cursor-agent mcp list-tools wpfpilot-mcp
-```
+Restart Claude Desktop after saving.
 
 </details>
 
@@ -193,130 +160,11 @@ Create `.vscode/mcp.json`:
 }
 ```
 
-</details>
-
-<details>
-<summary>Cline</summary>
-
-Use the Cline MCP server configuration UI and add:
-
-```json
-{
-  "mcpServers": {
-    "wpfpilot-mcp": {
-      "command": "npx",
-      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
-    }
-  }
-}
-```
+Or: `code --add-mcp '{"name":"wpfpilot-mcp","command":"npx","args":["-y","@skuzadev/wpfpilot-mcp"]}'`
 
 </details>
 
-<details>
-<summary>Continue</summary>
-
-Add to your Continue MCP configuration:
-
-```json
-{
-  "mcpServers": [
-    {
-      "name": "wpfpilot-mcp",
-      "command": "npx",
-      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
-    }
-  ]
-}
-```
-
-</details>
-
-<details>
-<summary>Windsurf</summary>
-
-Add a local stdio MCP server:
-
-```json
-{
-  "mcpServers": {
-    "wpfpilot-mcp": {
-      "command": "npx",
-      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary>Zed</summary>
-
-Add to `settings.json`:
-
-```json
-{
-  "context_servers": {
-    "wpfpilot-mcp": {
-      "source": "custom",
-      "command": "npx",
-      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary>JetBrains AI Assistant</summary>
-
-In JetBrains IDEs:
-
-1. Open Settings.
-2. Go to Tools -> AI Assistant -> Model Context Protocol (MCP).
-3. Click Add.
-4. Select STDIO.
-5. Use command `npx` with arguments `-y @skuzadev/wpfpilot-mcp`.
-
-JSON form:
-
-```json
-{
-  "mcpServers": {
-    "wpfpilot-mcp": {
-      "command": "npx",
-      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
-    }
-  }
-}
-```
-
-</details>
-
-<details>
-<summary>Visual Studio</summary>
-
-For Visual Studio MCP configuration that uses the `servers` shape:
-
-```json
-{
-  "servers": {
-    "wpfpilot-mcp": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@skuzadev/wpfpilot-mcp"]
-    }
-  }
-}
-```
-
-</details>
-
-If a client cannot run `npx`, use the persistent installer and set the command to `wpfpilot-mcp`, or use the full path to `wpfpilot-mcp.exe` from a GitHub Release zip. For the expanded client guide, see [docs/all-clients.md](docs/all-clients.md).
-
-## First Prompt
+## First prompt
 
 After connecting the MCP client, ask:
 
@@ -334,18 +182,7 @@ Why is the Submit button disabled?
 Record this workflow and generate an xUnit test.
 ```
 
-## What It Can Do
-
-- Attach to or launch WPF processes.
-- Capture semantic UI snapshots.
-- Query text, value, state, bounds, patterns, children, ancestors, siblings, and selection.
-- Act with verbs such as click, set value, select, toggle, expand, collapse, scroll, and drag/drop.
-- Wait and assert on UI state with structured errors.
-- Capture screenshots.
-- Record workflows and generate test code.
-- Use an optional in-process probe for ViewModel, binding, command, validation, and dispatcher diagnostics.
-
-Core verb tools:
+## Tools
 
 | Tool | Purpose |
 | --- | --- |
@@ -355,101 +192,17 @@ Core verb tools:
 | `wpf_wait` | Wait for UI state. |
 | `wpf_assert` | Verify UI state. |
 
-## Optional WPF Probe
+Full tool list: [docs/tools-reference.md](docs/tools-reference.md).
 
-The probe runs inside your WPF process and exposes diagnostics that UI Automation cannot see directly.
+## Optional WPF probe
 
-Install after the probe package is published:
-
-```powershell
-dotnet add package WpfPilot.Mcp.Probe
-```
-
-Or reference the project while developing locally:
-
-```xml
-<ProjectReference Include="..\wpfpilot-mcp\src\WpfPilot.Mcp.Probe\WpfPilot.Mcp.Probe.csproj" />
-```
-
-Start the probe from `App.xaml.cs`:
-
-```csharp
-using System.Windows;
-using WpfPilot.Mcp.Probe;
-
-protected override void OnStartup(StartupEventArgs e)
-{
-    base.OnStartup(e);
-    ProbeHost.Start();
-}
-```
-
-Then ask your MCP client:
+The probe runs inside your WPF process and exposes diagnostics that UI Automation cannot see directly (bindings, ViewModels, commands, validation).
 
 ```text
 Use wpf_probe_connect, then inspect my ViewModel and binding errors.
 ```
 
-Default pipe name:
-
-```text
-wpfpilot-mcp-probe-{ProcessId}
-```
-
-## Release Maintainers
-
-Build and test:
-
-```powershell
-dotnet build WpfPilotMcp.sln --configuration Release
-dotnet test WpfPilotMcp.sln --configuration Release --no-build
-```
-
-Publish a self-contained Windows zip:
-
-```powershell
-dotnet publish src/WpfPilot.Mcp.Server/WpfPilot.Mcp.Server.csproj --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=false --output artifacts/wpfpilot-mcp-win-x64
-Rename-Item artifacts/wpfpilot-mcp-win-x64/WpfPilot.Mcp.Server.exe wpfpilot-mcp.exe
-Remove-Item artifacts/wpfpilot-mcp-win-x64/*.pdb -Force
-Compress-Archive -Path artifacts/wpfpilot-mcp-win-x64/* -DestinationPath artifacts/wpfpilot-mcp-win-x64.zip -Force
-```
-
-Tagging `vX.Y.Z` runs the release workflow and uploads the Windows zip.
-
-Publish the npm launcher:
-
-```powershell
-cd packages/npm
-npm publish --access public
-```
-
-## Development From Source
-
-Source builds are only needed for contributors:
-
-```powershell
-git clone https://github.com/<owner>/wpfpilot-mcp.git
-cd wpfpilot-mcp
-dotnet build WpfPilotMcp.sln
-dotnet test WpfPilotMcp.sln
-```
-
-Project layout:
-
-```text
-wpfpilot-mcp/
-  src/
-    WpfPilot.Mcp.Core/
-    WpfPilot.Mcp.Server/
-    WpfPilot.Mcp.Probe/
-    WpfPilot.Mcp.Codegen/
-  tests/
-    WpfPilot.Mcp.Core.Tests/
-    WpfPilot.Mcp.Probe.Tests/
-    WpfPilot.Mcp.Codegen.Tests/
-    WpfPilot.Mcp.IntegrationTests/
-  docs/
-```
+Setup: [docs/probe-setup.md](docs/probe-setup.md).
 
 ## Safety
 
@@ -465,11 +218,11 @@ WpfPilot is intended for local development and test automation.
 
 `wpfpilot-mcp` is not recognized
 
-Restart your terminal after running the installer, or use the full path to `wpfpilot-mcp.exe` in your MCP client configuration.
+Restart your terminal after running the installer, or use the full path to `wpfpilot-mcp.exe` in your MCP client configuration. See [all-clients.md](docs/all-clients.md#troubleshooting).
 
 Server starts but no tools appear
 
-Restart the MCP client and check its MCP logs. Also verify `wpfpilot-mcp` runs from a normal terminal.
+Restart the MCP client and check its MCP logs. Also verify `npx -y @skuzadev/wpfpilot-mcp` runs from a normal terminal.
 
 Cannot attach to an app
 
@@ -486,10 +239,12 @@ Confirm the target app called `ProbeHost.Start()`, then use `wpf_probe_status` a
 - [Probe setup](docs/probe-setup.md)
 - [Architecture](docs/architecture.md)
 - [Examples](docs/examples.md)
-- [Model Context Protocol local server guide](https://modelcontextprotocol.io/docs/develop/connect-local-servers)
-- [Claude Code MCP guide](https://code.claude.com/docs/en/mcp)
-- [Codex MCP server configuration](https://www.mintlify.com/openai/codex/configuration/mcp-servers)
-- [Cursor MCP guide](https://docs.cursor.com/context/model-context-protocol)
+- [Development](docs/development.md)
+- [Releasing](docs/releasing.md)
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
