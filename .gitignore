@@ -3,6 +3,8 @@ obj/
 artifacts/
 node_modules/
 .tools/
+.mcpregistry_github_token
+.mcpregistry_registry_token
 !packages/npm/bin/
 !packages/npm/bin/wpfpilot-mcp.js
 *.nupkg
